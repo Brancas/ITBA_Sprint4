@@ -1,5 +1,9 @@
+from cgitb import reset
+from os import times_result
+from sqlite3 import Timestamp
 from turtle import width
 from colorama import init, Fore, Back, Style
+from datetime import datetime
 import csv
 
 def openFile(name):
@@ -25,9 +29,36 @@ def filtro(array, clave, valor):
         if i[clave] == valor:
             resultado.append(i)   
     return resultado
+
+def filtrarFecha():
+    fecha1 = datetime.strptime(input("Fecha 1 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
+    fecha2 = datetime.strptime(input("Fecha 2 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
+    fecha1 = int(datetime.timestamp(fecha1))
+    fecha2 = int(datetime.timestamp(fecha2))
+    fechasFiltradas=[]
+    print(type(contenido))
+    print("Comienzio del test")
+
     
 
+    for i in contenido:
+        if int(datetime.timestamp(i['FechaOrigen'])) >= fecha1 and int(datetime.timestamp(i['FechaOrigen']))<= fecha2:
+            print(fecha1,i,fecha2)
+            fechasFiltradas.append(i)
+# SEGUIR PROBANDO ITERACIONES DE CODIGO HASTA QUE ENCUENTRE LA FORMA DE CONEVRTIR LAS FECHAS EN TIMESTAMP PARA FILTRARLAS
 
+    
+    print(fecha1)
+    print(fecha2)
+    # resultado = list()
+    # if not datetime.valor():
+    #     return array
+    
+    # for i[clave] == datetime.valor():
+    #     if 
+    #         resultado.append(i)
+    # return resultado
+    
 if __name__ == '__main__':
     runtime = 0
     while runtime == 0:
@@ -67,6 +98,8 @@ if __name__ == '__main__':
                 arrayFiltrada=  filtro(contenido,'DNI',dni )
             case '4':
                 opcion = 'RANGO DE FECHAS'
+                print('Ingrese un rango de fechas a buscar:')
+                filtrarFecha()
             case '_':
                 opcion = False
 
