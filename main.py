@@ -4,6 +4,7 @@ from sqlite3 import Timestamp
 from turtle import width
 from colorama import init, Fore, Back, Style
 from datetime import datetime
+# import pandas as pd
 import csv
 
 def openFile(name):
@@ -30,7 +31,7 @@ def filtro(array, clave, valor):
             resultado.append(i)   
     return resultado
 
-def filtrarFecha():
+def filtrarFecha(array,clave,valor):
     fecha1 = datetime.strptime(input("Fecha 1 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha2 = datetime.strptime(input("Fecha 2 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha1 = int(datetime.timestamp(fecha1))
@@ -38,13 +39,30 @@ def filtrarFecha():
     fechasFiltradas=[]
     print(type(contenido))
     print("Comienzio del test")
+    print(len(contenido))
 
-    
+    for i in array:
+            if i[clave] == valor:
+                fechasFiltradas.append(i)   
+                print(fechasFiltradas)
+    return fechasFiltradas
 
-    for i in contenido:
-        if int(datetime.timestamp(i['FechaOrigen'])) >= fecha1 and int(datetime.timestamp(i['FechaOrigen']))<= fecha2:
-            print(fecha1,i,fecha2)
-            fechasFiltradas.append(i)
+
+
+
+
+    # for i in contenido:
+    #     print(i[1])
+        # for row in i:
+        #     print(int(row[7]))
+
+
+        # f1 = int(i[7])
+        # if int(datetime.strptime(['FechaOrigen'])) >= fecha1:
+            
+
+            
+            # fechasFiltradas.append(i)
 # SEGUIR PROBANDO ITERACIONES DE CODIGO HASTA QUE ENCUENTRE LA FORMA DE CONEVRTIR LAS FECHAS EN TIMESTAMP PARA FILTRARLAS
 
     
@@ -86,6 +104,8 @@ if __name__ == '__main__':
                     
                 arrayFiltrada=  filtro(contenido,'Estado',opcion )
             case '2':
+                print('Como desea filtrar el archivo: \n1. EMITIDO \n2. RECHAZADO')
+                opcion = input('==> ')
                 match opcion:
                     case '1':
                         opcion = 'EMITIDO'
@@ -99,7 +119,7 @@ if __name__ == '__main__':
             case '4':
                 opcion = 'RANGO DE FECHAS'
                 print('Ingrese un rango de fechas a buscar:')
-                filtrarFecha()
+                fechasFiltradas = filtrarFecha(contenido, 'FechaOrigen','FechaPago')
             case '_':
                 opcion = False
 
@@ -107,7 +127,23 @@ if __name__ == '__main__':
         opcion = input('==> ')
         match opcion:
             case'1':
-                print(arrayFiltrada)
+                # print(fechasFiltradas)
+                for i in range(len(arrayFiltrada)):
+                    print(' ==============================')
+                    print('|| Nro de Cheque ==========>' + arrayFiltrada[i]['NroCheque']+' ||')
+                    print('|| Codigo de Banco ======>'+ arrayFiltrada[i]["CodigoBanco"]+' ||')
+                    print('|| Codigo de sucursal ===>'+ arrayFiltrada[i]["CodigoSucursal"]+' ||')
+                    print('|| Cuenta Origen ========>'+ arrayFiltrada[i]["NumeroCuentaOrigen"]+' ||')
+                    print('|| Cuenta Destino =======>'+ arrayFiltrada[i]["NumeroCuentaDestino"]+' ||')
+                    print('|| Valor/Monto ======>'+ arrayFiltrada[i]["Valor"]+' ||')
+                    print('|| Fecha Origen ==>'+ arrayFiltrada[i]["FechaOrigen"]+' ||')
+                    print('|| Fecha Pago ====>'+ arrayFiltrada[i]["FechaPago"]+' ||')
+                    print('|| DNI =============>'+ arrayFiltrada[i]["DNI"]+' ||')
+                    print('|| Estado =========>'+ arrayFiltrada[i]["Estado"]+' ||')
+                    print('|| Tipo ==========>'+ arrayFiltrada[i]["Tipo"]+' ||')
+                    print(' ==============================')
+                    print("Se encontraron transacciones")
+                    print(range(len(arrayFiltrada)))
             case'2':
                 pass
 
