@@ -1,11 +1,18 @@
+
 from cgitb import reset
-from os import times_result
+from hashlib import new
+from os import times_result, write
 from sqlite3 import Timestamp
 from turtle import width
+from black import NewLine
 from colorama import init, Fore, Back, Style
 from datetime import datetime
-# import pandas as pd
 import csv
+
+def pedirNombre():
+    name = input(Fore.GREEN + "Ingrese el nombre del archivo CSV: \n")
+    contenido = openFile(name)
+    return contenido
 
 def openFile(name):
     path = name + ".csv"
@@ -18,8 +25,13 @@ def openFile(name):
 
 def createFile(name):
     path = name + ".csv"
-    with open(path, "w") as file:
-        print(file)
+    with open(path, "w", newline='') as file:
+        encabezado = ['NroCheque','CodigoBanco','CodigoSucursal','NumeroCuentaOrigen','NumeroCuentaDestino','Valor','FechaOrigen','FechaPago','DNI','Estado','Tipo']
+        writer = csv.DictWriter(file, fieldnames = encabezado)
+        writer.writeheader()
+        for row in arrayFiltrada:
+            writer.writerow(row)
+        file.close()
 
 def filtro(array, clave, valor):
     resultado = list()
@@ -31,62 +43,52 @@ def filtro(array, clave, valor):
             resultado.append(i)   
     return resultado
 
-def filtrarFecha(array,clave,valor):
+def filtrarFecha():
     fecha1 = datetime.strptime(input("Fecha 1 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha2 = datetime.strptime(input("Fecha 2 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha1 = int(datetime.timestamp(fecha1))
     fecha2 = int(datetime.timestamp(fecha2))
-    fechasFiltradas=[]
-    print(type(contenido))
-    print("Comienzio del test")
-    print(len(contenido))
-
-    for i in array:
-            if i[clave] == valor:
-                fechasFiltradas.append(i)   
-                print(fechasFiltradas)
+    fechasFiltradas = list()
+    for i in contenido:
+        fechasContenido = i['FechaOrigen']
+        fechasDateTime = datetime.strptime(fechasContenido, '%d-%m-%Y')
+        fechasDateTime = int(datetime.timestamp(fechasDateTime))
+        comparacion = fecha1 <= fechasDateTime and fecha2 >= fechasDateTime
+        if comparacion:
+            print(f"{fechasDateTime}  = {fechasContenido}")
+            fechasFiltradas.append(i)
     return fechasFiltradas
 
+def pantalla():
+    for i in range(len(arrayFiltrada)):
+                    print(' ==============================')
+                    print('|| Nro de Cheque ==========>' + arrayFiltrada[i]['NroCheque']+' ||')
+                    print('|| Codigo de Banco ======>'+ arrayFiltrada[i]["CodigoBanco"]+' ||')
+                    print('|| Codigo de sucursal ===>'+ arrayFiltrada[i]["CodigoSucursal"]+' ||')
+                    print('|| Cuenta Origen ========>'+ arrayFiltrada[i]["NumeroCuentaOrigen"]+' ||')
+                    print('|| Cuenta Destino =======>'+ arrayFiltrada[i]["NumeroCuentaDestino"]+' ||')
+                    print('|| Valor/Monto ======>'+ arrayFiltrada[i]["Valor"]+' ||')
+                    print('|| Fecha Origen ==>'+ arrayFiltrada[i]["FechaOrigen"]+' ||')
+                    print('|| Fecha Pago ====>'+ arrayFiltrada[i]["FechaPago"]+' ||')
+                    print('|| DNI =============>'+ arrayFiltrada[i]["DNI"]+' ||')
+                    print('|| Estado =========>'+ arrayFiltrada[i]["Estado"]+' ||')
+                    print('|| Tipo ==========>'+ arrayFiltrada[i]["Tipo"]+' ||')
+                    print(' ==============================')
+                 
 
-
-
-
-    # for i in contenido:
-    #     print(i[1])
-        # for row in i:
-        #     print(int(row[7]))
-
-
-        # f1 = int(i[7])
-        # if int(datetime.strptime(['FechaOrigen'])) >= fecha1:
-            
-
-            
-            # fechasFiltradas.append(i)
-# SEGUIR PROBANDO ITERACIONES DE CODIGO HASTA QUE ENCUENTRE LA FORMA DE CONEVRTIR LAS FECHAS EN TIMESTAMP PARA FILTRARLAS
-
-    
-    print(fecha1)
-    print(fecha2)
-    # resultado = list()
-    # if not datetime.valor():
-    #     return array
-    
-    # for i[clave] == datetime.valor():
-    #     if 
-    #         resultado.append(i)
-    # return resultado
-    
 if __name__ == '__main__':
     runtime = 0
     while runtime == 0:
         print(Fore.RED + 'APP de Procesamiento batch de cheques')
         print(Style.RESET_ALL)
-        try:
-            name = input(Fore.GREEN + "Ingrese el nombre del archivo CSV: \n")
-            contenido = openFile(name)
-        except:
-            createFile(name)
+        while True:
+            try:
+                contenido = pedirNombre()
+                break
+            except:
+                continue
+
+                
 
         print(Fore.CYAN+ 'Indique una opcion para filtrar: \n1. ESTADO \n2. TIPO\n3. DNI \n4. RANGO DE FECHAS(no disponible)\nPor defecto SIN FILTRO')
         opcion = input('==> ')
@@ -119,7 +121,7 @@ if __name__ == '__main__':
             case '4':
                 opcion = 'RANGO DE FECHAS'
                 print('Ingrese un rango de fechas a buscar:')
-                fechasFiltradas = filtrarFecha(contenido, 'FechaOrigen','FechaPago')
+                arrayFiltrada = filtrarFecha()
             case '_':
                 opcion = False
 
@@ -127,31 +129,11 @@ if __name__ == '__main__':
         opcion = input('==> ')
         match opcion:
             case'1':
-                # print(fechasFiltradas)
-                for i in range(len(arrayFiltrada)):
-                    print(' ==============================')
-                    print('|| Nro de Cheque ==========>' + arrayFiltrada[i]['NroCheque']+' ||')
-                    print('|| Codigo de Banco ======>'+ arrayFiltrada[i]["CodigoBanco"]+' ||')
-                    print('|| Codigo de sucursal ===>'+ arrayFiltrada[i]["CodigoSucursal"]+' ||')
-                    print('|| Cuenta Origen ========>'+ arrayFiltrada[i]["NumeroCuentaOrigen"]+' ||')
-                    print('|| Cuenta Destino =======>'+ arrayFiltrada[i]["NumeroCuentaDestino"]+' ||')
-                    print('|| Valor/Monto ======>'+ arrayFiltrada[i]["Valor"]+' ||')
-                    print('|| Fecha Origen ==>'+ arrayFiltrada[i]["FechaOrigen"]+' ||')
-                    print('|| Fecha Pago ====>'+ arrayFiltrada[i]["FechaPago"]+' ||')
-                    print('|| DNI =============>'+ arrayFiltrada[i]["DNI"]+' ||')
-                    print('|| Estado =========>'+ arrayFiltrada[i]["Estado"]+' ||')
-                    print('|| Tipo ==========>'+ arrayFiltrada[i]["Tipo"]+' ||')
-                    print(' ==============================')
-                    print("Se encontraron transacciones")
-                    print(range(len(arrayFiltrada)))
+                pantalla()
             case'2':
-                pass
+                createFile(f"{arrayFiltrada[0]['DNI']} {datetime.timestamp(datetime.now())}")
 
 
-        # print('Indique una opcion para coninuar \n1. Agregar nuevo movimiento \n2. Ver movimientos\n3. Terminar(Por defecto)')
-        # opcion = input('==> ')
-
-        
 
         print('Desea continuar \n1. SI \n2. NO \n')
         runtime = input('==> ')
