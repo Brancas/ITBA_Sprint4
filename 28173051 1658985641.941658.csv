@@ -1,0 +1,2 @@
+NroCheque,CodigoBanco,CodigoSucursal,NumeroCuentaOrigen,NumeroCuentaDestino,Valor,FechaOrigen,FechaPago,DNI,Estado,Tipo
+2,363,678,146,781,2668.03,05-10-2008,05-08-2022,28173051,APROBADO,EMITIDO

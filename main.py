@@ -1,11 +1,5 @@
 
-from cgitb import reset
-from hashlib import new
-from os import times_result, write
-from sqlite3 import Timestamp
-from turtle import width
-from black import NewLine
-from colorama import init, Fore, Back, Style
+from colorama import Fore, Style
 from datetime import datetime
 import csv
 
@@ -40,22 +34,23 @@ def filtro(array, clave, valor):
         
     for i in array:
         if i[clave] == valor:
-            resultado.append(i)   
+            resultado.append(i)
+    if not resultado:
+        print('No se encontraron coincidencias')
     return resultado
 
-def filtrarFecha():
+def filtrarFecha(eleccion):
     fecha1 = datetime.strptime(input("Fecha 1 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha2 = datetime.strptime(input("Fecha 2 (Formato: DAY-MONTH-YEAR): "),('%d-%m-%Y'))
     fecha1 = int(datetime.timestamp(fecha1))
     fecha2 = int(datetime.timestamp(fecha2))
     fechasFiltradas = list()
     for i in contenido:
-        fechasContenido = i['FechaOrigen']
+        fechasContenido = i[eleccion]
         fechasDateTime = datetime.strptime(fechasContenido, '%d-%m-%Y')
         fechasDateTime = int(datetime.timestamp(fechasDateTime))
         comparacion = fecha1 <= fechasDateTime and fecha2 >= fechasDateTime
         if comparacion:
-            print(f"{fechasDateTime}  = {fechasContenido}")
             fechasFiltradas.append(i)
     return fechasFiltradas
 
@@ -77,8 +72,7 @@ def pantalla():
                  
 
 if __name__ == '__main__':
-    runtime = 0
-    while runtime == 0:
+    while True:
         print(Fore.RED + 'APP de Procesamiento batch de cheques')
         print(Style.RESET_ALL)
         while True:
@@ -89,76 +83,73 @@ if __name__ == '__main__':
                 continue
 
                 
-
-        print(Fore.CYAN+ 'Indique una opcion para filtrar: \n1. ESTADO \n2. TIPO\n3. DNI \n4. RANGO DE FECHAS(no disponible)\nPor defecto SIN FILTRO')
-        opcion = input('==> ')
-        match opcion:
-            case '1':
-                print('Como desea filtrar el archivo: \n1. PENDIENTE \n2. APROBADO \n3. RECHAZADO')
+        while True:
+            print(Fore.CYAN+ 'Indique una opcion para filtrar: \n1. ESTADO \n2. TIPO\n3. DNI \n4. RANGO DE FECHAS')
+            opcion = input('==> ')
+            match opcion:
+                case '1':
+                    while True:
+                        print('Como desea filtrar el archivo: \n1. PENDIENTE \n2. APROBADO \n3. RECHAZADO')
+                        opcion = input('==> ')
+                        match opcion:
+                            case '1':
+                                opcion = 'PENDIENTE'
+                            case '2':
+                                opcion = 'APROBADO'
+                            case '3':
+                                opcion = 'RECHAZADO'
+                            case _:
+                                continue                     
+                        arrayFiltrada=  filtro(contenido,'Estado',opcion )
+                        break
+                case '2':
+                    while True:
+                        print('Como desea filtrar el archivo: \n1. EMITIDO \n2. RECHAZADO')
+                        opcion = input('==> ')
+                        match opcion:
+                            case '1':
+                                opcion = 'EMITIDO'
+                            case '2':
+                                opcion = 'DEPOSITADO'
+                            case _:
+                                continue    
+                        arrayFiltrada=  filtro(contenido,'Tipo',opcion )
+                        break
+                case '3':
+                    dni = input(Fore.BLUE + 'Ingrese el DNI a buscar: ')
+                    arrayFiltrada=  filtro(contenido,'DNI',dni )
+                case '4':
+                    opcion = 'RANGO DE FECHAS'
+                    while True:
+                        print("Elija opcion de filtro: \n1. Fecha de Origen \n2. Fecha de pago")
+                        eleccion = input()
+                        if eleccion == str(1):
+                            eleccion = 'FechaOrigen'
+                        elif eleccion == str(2):
+                            eleccion = 'FechaPago'
+                        else:
+                            continue
+                        print('Ingrese un rango de fechas a buscar:')
+                        arrayFiltrada = filtrarFecha(eleccion)
+                        break
+                case '_':
+                    continue
+            break
+        if arrayFiltrada:    
+            while True:
+                print('Elija una opcion para la salida de datos \n1. PANTALLA \n2. CSV')
                 opcion = input('==> ')
                 match opcion:
-                    case '1':
-                        opcion = 'PENDIENTE'
-                    case '2':
-                        opcion = 'APROBADO'
-                    case '3':
-                        opcion = 'RECHAZADO'
-                    
-                arrayFiltrada=  filtro(contenido,'Estado',opcion )
-            case '2':
-                print('Como desea filtrar el archivo: \n1. EMITIDO \n2. RECHAZADO')
-                opcion = input('==> ')
-                match opcion:
-                    case '1':
-                        opcion = 'EMITIDO'
-                    case '2':
-                        opcion = 'DEPOSITADO'
-                    
-                arrayFiltrada=  filtro(contenido,'Tipo',opcion )
-            case '3':
-                dni = input(Fore.BLUE + 'Ingrese el DNI a buscar: ')
-                arrayFiltrada=  filtro(contenido,'DNI',dni )
-            case '4':
-                opcion = 'RANGO DE FECHAS'
-                print('Ingrese un rango de fechas a buscar:')
-                arrayFiltrada = filtrarFecha()
-            case '_':
-                opcion = False
-
-        print('Elija una opcion para la salida de datos \n1. PANTALLA \n2. CSV')
-        opcion = input('==> ')
-        match opcion:
-            case'1':
-                pantalla()
-            case'2':
-                createFile(f"{arrayFiltrada[0]['DNI']} {datetime.timestamp(datetime.now())}")
-
-
+                    case'1':
+                        pantalla()
+                    case'2':
+                        createFile(f"{arrayFiltrada[0]['DNI']} {datetime.timestamp(datetime.now())}")
+                    case '_':
+                        continue
+                break
 
         print('Desea continuar \n1. SI \n2. NO \n')
-        runtime = input('==> ')
-        if runtime == '2':
-            runtime = 3
-        else:
-            runtime = 0
+        opcion = input('==> ')
+        if int(opcion) != int(1):
+            break
     print(Style.RESET_ALL)
-
-
-
-
-
-
-# archivo = input(Fore.GREEN + 'Ingrese el nombre del archivo CSV: \n')
-# print('Como desea filtrar el archivo: \n1. PENDIENTE \n2. APROBADO \n3. RECHAZADO')
-# opcion = input('==> ')
-# print('Elija una opcion para la salida de datos \n1. PANTALLA \n2. CSV')
-# opcion = input('==> ')
-# print('Indique una opcion para coninuar \n1. Agregar nuevo movimiento \n2. Ver movimientos\n3. Terminar(Por defecto)')
-# opcion = input('==> ')
-# print('Indique una opcion para filtrar movimientos \n1. ESTADO \n2. DNI \n3. RANGO DE FECHAS')
-# opcion = input('==> ')
-# print('Desea continuar \n1. SI \n2. NO \n')
-# runtime = input('==> ')
-# if runtime == 1:
-#     runtime=0
-# print(Style.RESET_ALL)
